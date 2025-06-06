@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escape Room: Programação C</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .bg-darker {
+            background-color: #0a0a14;
+        }
+        .text-code {
+            font-family: 'Share Tech Mono', monospace;
+            color: #0af;
+        }
+        .glow-blue {
+            text-shadow: 0 0 5px #0af, 0 0 10px #0af;
+        }
+        .glow-green {
+            text-shadow: 0 0 5px #0f0, 0 0 10px #0f0;
+        }
+        .glow-purple {
+            text-shadow: 0 0 5px #a0f, 0 0 10px #a0f;
+        }
+        .neon-border {
+            border: 1px solid #0af;
+            box-shadow: 0 0 5px #0af, 0 0 10px #0af;
+        }
+        .cyberpunk-btn {
+            transition: all 0.3s;
+        }
+        .cyberpunk-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px currentColor;
+        }
+        .code-block {
+            background-color: #0f1621;
+            border-left: 3px solid #0af;
+            font-family: 'Share Tech Mono', monospace;
+            color: #ccc;
+        }
+        .comment {
+            color: #5a7;
+        }
+        .keyword {
+            color: #d49;
+        }
+        .type {
+            color: #6af;
+        }
+        .string {
+            color: #ea8;
+        }
+        .number {
+            color: #6f9;
+        }
+    </style>
+</head>
+<body class="bg-darker text-gray-200 min-h-screen font-sans">
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-10">
+            <h1 class="text-4xl md:text-6xl font-bold mb-4 text-code glow-blue">ESCAPE ROOM</h1>
+            <h2 class="text-2xl md:text-3xl text-code glow-purple">Programação em C: Structs e Funções void</h2>
+            <div class="mt-6 flex justify-center">
+                <div class="relative h-2 bg-gray-800 rounded-full w-3/4 max-w-2xl overflow-hidden">
+                    <div id="progress-bar" class="absolute top-0 left-0 h-full bg-gradient-to-r from-cyan-500 to-blue-600" style="width: 5%;"></div>
+                </div>
+            </div>
+            <div id="phase-counter" class="mt-2 text-code text-cyan-400 animate-pulse">Fase 1 de 20</div>
+        </header>
+
+        <main class="max-w-4xl mx-auto">
+            <!-- Tela de introdução -->
+            <div id="intro-screen" class="text-center p-8 neon-border rounded-lg">
+                <h2 class="text-3xl text-code glow-purple mb-6">Bem-vindo ao Sistema Corrompido</h2>
+                <p class="mb-8 text-code text-cyan-300 ">Você foi hackeado por um software malicioso que bloqueou seu terminal. Para escapar, você precisa resolver 20 desafios de programação em C sobre structs e funções void.</p>
+                <p class="mb-8 text-code text-cyan-300">A cada fase decodificada, você ganha mais acesso ao sistema.</p>
+                
+                <div class="space-y-4 max-w-md mx-auto">
+                    <div class="form-group">
+                        <label for="player-name" class="block text-left text-code text-cyan-400 mb-2">Insira seu nome:</label>
+                        <input type="text" id="player-name" class="w-full px-4 py-2 bg-gray-900 border border-cyan-500 rounded focus:outline-none focus:ring-2 focus:ring-cyan-500 text-code" placeholder="SeuNome">
+                        <div class="flex justify-center mt-8">
+                            <button id="start-button" class="cyberpunk-btn px-8 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-full font-bold hover:from-purple-700 hover:to-blue-700 glow-purple">
+                                INICIAR DESAFIO <i class="fas fa-terminal ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tela do jogo -->
+            <div id="game-screen" class="hidden">
+                <!-- Nível atual e prompt -->
+                <div class="mb-8">
+                    <div class="flex items-center mb-4">
+                        <span class="text-code text-purple-400 mr-4">SYSTEM ></span>
+                        <h2 id="phase-title" class="text-xl md:text-2xl text-code glow-blue"></h2>
+                    </div>
+                    
+                    <!-- História do nível -->
+                    <div id="phase-story" class="mb-6 px-4 py-3 bg-gray-800 rounded border-l-4 border-purple-500 text-code text-gray-300">
+                        <!-- Dinâmico -->
+                    </div>
+                </div>
+
+                <!-- Conteúdo do nível -->
+                <div class="mb-8">
+                    <!-- Questão -->
+                    <div id="phase-question" class="mb-6 code-block p-4 rounded">
+                        <!-- Dinâmico -->
+                    </div>
+
+                    <!-- Opções de resposta -->
+                    <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Dinâmico -->
+                    </div>
+                </div>
+
+                <!-- Feedback -->
+                <div id="feedback-container" class="hidden my-6 p-4 rounded border">
+                    <!-- Dinâmico -->
+                </div>
+
+                <!-- Botões de navegação -->
+                <div class="flex justify-between mt-8">
+                    <!-- <button id="restart-button" class="cyberpunk-btn px-6 py-2 bg-gray-700 hover:bg-gray-600 rounded text-code text-red-400">
+                        <i class="fas fa-sync-alt mr-2"></i> Recomeçar
+                    </button> -->
+                    <button id="next-button" class="cyberpunk-btn hidden px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded text-code text-white">
+                        Próxima Fase <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tela de conclusão -->
+            <div id="completion-screen" class="hidden text-center p-8 neon-border rounded-lg">
+                <div class="flex justify-center mb-6">
+                    <i class="fas fa-trophy text-6xl text-yellow-400 glow-purple"></i>
+                </div>
+                <h2 class="text-3xl md:text-4xl text-code glow-green mb-6">CONGRATULAÇÕES, <span id="player-name-display" class="text-yellow-300"></span>!</h2>
+                <p class="mb-6 text-xl">Você escapou do sistema corrompido!</p>
+                <p class="mb-8 text-code text-cyan-300">Todos os 20 desafios foram completados com sucesso.</p>
+                
+                <div class="certificate bg-gray-800 p-8 rounded-lg neon-border max-w-2xl mx-auto mb-8">
+                    <h3 class="text-2xl text-code glow-blue mb-4">Certificado de Conclusão</h3>
+                    <p class="mb-4">Este certificado atesta que <span id="cert-name" class="text-yellow-300"></span></p>
+                    <p class="mb-6">completou com sucesso o Escape Room de Programação em C</p>
+                    <div class="flex justify-center mb-4">
+                        <div class="border-t-2 border-blue-500 w-3/4"></div>
+                    </div>
+                    <p class="text-code text-sm">Validado em: <span id="completion-date"></span></p>
+                </div>
+                
+                <button id="print-button" class="cyberpunk-btn px-6 py-2 bg-green-600 hover:bg-green-700 rounded text-code text-white mr-4">
+                    <i class="fas fa-print mr-2"></i> Imprimir Certificado
+                </button>
+                <button id="restart-game-button" class="cyberpunk-btn px-6 py-2 bg-purple-600 hover:bg-purple-700 rounded text-code text-white">
+                    <i class="fas fa-redo mr-2"></i> Jogar Novamente
+                </button>
+            </div>
+        </main>
+
+        <footer class="mt-16 text-center text-gray-500 text-sm">
+            <p>{ 2025 - SENAI  - Técnico em Desenvolvimento de Sistemas - Profº Robson Souza }</p>
+            <!-- <p class="mt-2 text-xs text-gray-600">Tema cyberpunk para aprendizado de C</p> -->
+        </footer>
+    </div>
+
+    <script>
+        // Configuração do jogo
+        let errorCount = 0;
+
+        const gameData = {
+            playerName: "",
+            currentPhase: 0,
+            totalPhases: 20,
+            phases: [
+                // Fase 1 - Introdução a struct
+                {
+                    title: "DECODIFICANDO A PRIMEIRA STRUCT",
+                    story: "O acesso ao sistema principal está bloqueado. Você encontra um trecho de código que parece ser a chave para desbloquear o primeiro nível do firewall.",
+                    question: `Qual é a sintaxe correta para definir uma <span class="keyword">struct</span> em C que represente um ponto em 2D com coordenadas x e y?`,
+                    code: "",
+                    options: [
+                        { text: 'A) <span class="keyword">struct</span> <span class="type">Ponto</span> { <span class="type">int</span> x, y; }', correct: false },
+                        { text: 'B) <span class="keyword">struct</span> <span class="type">Ponto2D</span> { <span class="type">int</span> x; <span class="type">int</span> y; };', correct: true },
+                        { text: 'C) <span class="keyword">struct</span> { <span class="type">int</span> x; <span class="type">int</span> y; } <span class="type">Ponto</span>;', correct: false },
+                        { text: 'D) <span class="type">Ponto</span> = <span class="keyword">struct</span> { <span class="type">int</span> x, y; };', correct: false }
+                    ],
+                    explanation: 'A resposta correta é a B. Em C, definimos uma struct com a palavra-chave "struct", seguida pelo nome da struct (Ponto2D), e os membros entre chaves, terminando com ponto e vírgula.'
+                },
+                // Fase 2 - Leitura de struct
+                {
+                    title: "LENDO UMA STRUCT",
+                    story: "Agora que você definiu a struct, precisa acessar seus membros para obter as coordenadas do ponto de entrada no sistema.",
+                    question: `Tendo a struct <span class="keyword">struct</span> <span class="type">Ponto</span> { <span class="type">int</span> x, y; }; e a variável <span class="type">Ponto</span> p;, como acessar o membro x?`,
+                    code: "",
+                    options: [
+                        { text: 'A) <span class="type">Ponto</span>.<span class="type">x</span>', correct: false },
+                        { text: 'B) <span class="type">p->x</span>', correct: false },
+                        { text: 'C) <span class="type">p.x</span>', correct: true },
+                        { text: 'D) <span class="type">x(p)</span>', correct: false }
+                    ],
+                    explanation: 'A resposta correta é a C. Para acessar membros de uma struct através de uma variável, usamos o operador ponto (.). O operador seta (->) é usado com ponteiros para structs.'
+                },
+                // Fase 3 - Inicialização de struct
+                {
+                    title: "INICIALIZAÇÃO DE MEMBROS",
+                    story: "O sistema de login requer que você inicialize uma struct com valores específicos para autenticação.",
+                    question: `Qual é a forma correta de inicializar uma struct <span class="type">Aluno</span> { <span class="type">char</span> nome[50]; <span class="type">int</span> idade; }; no momento da declaração?`,
+                    code: "",
+                    options: [
+                        { text: 'A) <span class="type">Aluno</span> a = {"Maria", 20}', correct: true },
+                        { text: 'B) <span class="type">Aluno</span> a; <br>a = {"Maria", 20}', correct: false },
+                        { text: 'C) <span class="type">Aluno</span> a; <br>a.nome = "Maria"; a.idade = 20', correct: false },
+                        { text: 'D) <span class="type">Aluno</span> a(); <br>a("Maria", 20)', correct: false }
+                    ],
+                    explanation: 'A resposta correta é a A. Em C, podemos inicializar uma struct no momento da declaração usando chaves com os valores na ordem dos membros. As outras opções não são sintaxe válida em C.'
+                },
+                // Fase 4 - Structs aninhadas
+                {
+                    title: "ESTRUTURAS ANINHADAS",
+                    story: "Você encontrou um subsistema que usa estruturas aninhadas para armazenar informações complexas sobre os módulos do firewall.",
+                    question: `Como definir uma struct <span class="type">Endereco</span> dentro de uma struct <span class="type">Pessoa</span>?`,
+                    code: `<span class="keyword">struct</span> <span class="type">Endereco</span> {
+    <span class="type">char</span> rua[50];
+    <span class="type">int</span> numero;
+};
+
+<span class="comment">// Como incluir Endereco em Pessoa?</span>`,
+                    options: [
+                        { text: 'A) <span class="keyword">struct</span> <span class="type">Pessoa</span> { <span class="type">Endereco</span> addr; }', correct: true },
+                        { text: 'B) <span class="keyword">struct</span> <span class="type">Pessoa</span> { <span class="type">struct</span> <span class="type">Endereco</span>(addr); }', correct: false },
+                        { text: 'C) <span class="keyword">struct</span> <span class="type">Pessoa</span>(<span class="type">Endereco</span> addr);', correct: false },
+                        { text: 'D) <span class="keyword">struct</span> <span class="type">Pessoa</span> { <span class="type">Endereco</span> = addr; }', correct: false }
+                    ],
+                    explanation: 'A resposta correta é a A. Para incluir uma struct dentro de outra, basta declarar o membro com o tipo da struct como qualquer outro tipo. No caso, "Endereco addr;" cria um membro chamado addr do tipo Endereco.'
+                },
+                // Fase 5 - Arrays de structs
+                {
+                    title: "ARRAY DE ESTRUTURAS",
+                    story: "Para desbloquear o módulo de redes, você precisa manipular um array de estruturas que representam nós da rede.",
+                    question: `Como declarar e inicializar um array de 3 structs <span class="type">Ponto</span> com as coordenadas (0,0), (1,1) e (2,4)?`,
+                    code: `<span class="keyword">struct</span> <span class="type">Ponto</span> {
+    <span class="type">int</span> x;
+    <span class="type">int</span> y;
+};`,
+                    options: [
+                        { text: 'A) <span class="type">Ponto</span> pontos[3] = {0,0,1,1,2,4}', correct: false },
+                        { text: 'B) <span class="type">Ponto</span> pontos[3] = {{0,0}, {1,1}, {2,4}}', correct: true },
+                        { text: 'C) <span class="type">Ponto</span> pontos[3]; <br>pontos = {0,0,1,1,2,4}', correct: false },
+                        { text: 'D) <span class="type">Ponto</span>[3] pontos = ({0,0}, {1,1}, {2,4})', correct: false }
+                    ],
+                    explanation: 'A resposta correta é a B. Para inicializar um array de structs, usamos chaves externas para o array e internas para cada struct. A sintaxe {{0,0}, {1,1}, {2,4}} é a correta.'
+                },
+                // Fase 6 - Definindo membros complexos
+                {
+                    title: "MEMBROS COMPOSTOS",
+                    story: "O sistema de arquivos corrompido usa estruturas com membros complexos para armazenar metadados. Você precisa entender como eles são definidos.",
+                    question: `Qual é a forma correta de definir uma struct <span class="type">Produto</span> que contenha um nome (string), preço (float) e um array de 5 avaliações (int)?`,
+                    code: "",
+                    options: [
+                        { text: 'A) <span class="keyword">struct</span> <span class="type">Produto</span> { <span class="type">char</span> *nome; <span class="type">float</span> preco; <span class="type">int</span> avaliacoes[]; }', correct: false },
+                        { text: 'B) <span class="keyword">struct</span> <span class="type">Produto</span> { <span class="type">char</span> nome[50]; <span class="type">float</span> preco; <span class="type">int</span> avaliacoes[5]; };', correct: true },
+                        { text: 'C) <span class="keyword">struct</span> <span class="type">Produto</span> { <span class="type">string</span> nome; <span class="type">float</span> preco; <span class="type">int</span>[5] avaliacoes; }', correct: false },
+                        { text: 'D) <span class="keyword">struct</span> <span class="type">Produto</span> = { <span class="type">char</span> nome[]; <span class="type">float</span> preco; <span class="type">int</span> avaliacoes[5]; }', correct: false }
+                    ],
+                    explanation: 'A resposta correta é a B. Devemos especificar o tamanho do array (nome[50] e avaliacoes[5]), usar tipos corretos (char para strings em C), e terminar com ponto e vírgula.'
+                },
+                // Fase 7 - Typedef com structs
+                {
+                    title: "SIMPLIFICANDO COM TYPEDEF",
+                    story: "Para melhorar a legibilidade do código do sistema, você decide usar typedef para simplificar a sintaxe das structs.",
+                    question: `Como usar <span class="keyword">typedef</span> para criar um sinônimo <span class="type">Coordenada</span> para <span class="keyword">struct</span> <span class="type">Ponto</span>?`,
+                    code: `<span class="keyword">struct</span> <span class="type">Ponto</span> {
+    <span class="type">float</span> x;
+    <span class="type">float</span> y;
+};`,
+                    options: [
+                        { text: 'A) <span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="type">Ponto</span> <span class="type">Coordenada</span>', correct: false },
+                        { text: 'B) <span class="keyword">typedef</span> <span class="type">Ponto</span> <span class="type">Coordenada</span>', correct: false },
+                        { text: 'C) <span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="type">Ponto</span> <span class="type">Coordenada</span>;', correct: true },
+                        { text: 'D) <span class="keyword">typedef</span> <span class="type">Coordenada</span> = <span class="keyword">struct</span> <span class="type">Ponto</span>', correct: false }
+                    ],
+                    explanation: 'A resposta correta é a C. A sintaxe correta para typedef com structs é "typedef struct Ponto Coordenada;". Note o ponto e vírgula no final, que faltava na opção A.'
+                },
+                // Fase 8 - Ponteiros para structs
+                {
+                    title: "PONTEIROS PARA STRUCTS",
+                    story: "O subsistema de memória usa ponteiros para estruturas para otimizar o acesso aos dados. Você precisa entender como funcionam.",
+                    question: `Tendo <span class="keyword">struct</span> <span class="type">Livro</span> { <span class="type">char</span> titulo[50]; }; e <span class="type">Livro</span> *livroPtr;, como acessar o título?`,
+                    code: "",
+                    options: [
+                        { text: 'A) <span class="type">livroPtr.titulo</span>', correct: false },
+                        { text: 'B) <span class="type">livroPtr->titulo</span>', correct: true },
+                        { text: 'C) <span class="type">*livroPtr.titulo</span>', correct: false },
+                        { text: 'D) <span class="type">(*livroPtr).titulo</span> ou <span class="type">livroPtr->titulo</span>', correct: true }
+                    ],
+                    explanation: 'As respostas corretas são B e D. Com ponteiros para structs, usamos o operador seta (->) ou a sintaxe de desreferência com ponto: (*ponteiro).membro. A opção D inclui ambas formas válidas.'
+                },
+                // Fase 9 - Structs como parâmetros
+                {
+                    title: "PASSANDO STRUCTS COMO PARÂMETROS",
+                    story: "Você precisa criar funções que manipulem estruturas para consertar os módulos de autenticação.",
+                    question: `Como declarar corretamente uma função que recebe uma struct <span class="type">Pessoa</span> como parâmetro?`,
+                    code: `<span class="keyword">struct</span> <span class="type">Pessoa</span> {
+    <span class="type">char</span> nome[50];
+    <span class="type">int</span> idade;
+};`,
+                    options: [
+                        { text: 'A) <span class="type">void</span> exibir(<span class="keyword">struct</span> <span class="type">Pessoa</span> p)', correct: true },
+                        { text: 'B) <span class="type">void</span> exibir(<span class="type">Pessoa</span> p)', correct: false },
+                        { text: 'C) <span class="type">void</span> exibir(<span class="type">pessoa</span> <span class="type">Pessoa</span>)', correct: false },
+                        { text: 'D) <span class="type">void</span> exibir(<span class="type">Pessoa</span> <span class="keyword">struct</span> p)', correct: false }
+                    ],
+                    explanation: 'A resposta correta é a A. Ao passar uma struct como parâmetro, devemos usar a palavra-chave "struct" seguida do nome da struct, a menos que tenhamos usado typedef.'
+                },
+                // Fase 10 - Retornando structs
+                {
+                    title: "RETORNANDO STRUCTS DE FUNÇÕES",
+                    story: "O gerador de perfis do sistema precisa criar e retornar estruturas completas. Você deve corrigir a função.",
+                    question: `Como declarar corretamente uma função que retorna uma struct <span class="type">Ponto</span>?`,
+                    code: `<span class="keyword">struct</span> <span class="type">Ponto</span> {
+    <span class="type">int</span> x, y;
+};`,
+                    options: [
+                        { text: 'A) <span class="type">Ponto</span> criarPonto()', correct: false },
+                        { text: 'B) <span class="keyword">struct</span> <span class="type">Ponto</span> criarPonto()', correct: true },
+                        { text: 'C) <span class="keyword">struct</span> criarPonto()', correct: false },
+                        { text: 'D) <span class="type">*Ponto</span> criarPonto()', correct: false }
+                    ],
+                    explanation: 'A resposta correta é a B. Para retornar uma struct, o tipo de retorno deve ser "struct Ponto", a menos que tenhamos usado typedef para criar um sinônimo.'
+                },
+                // Fase 11 - Introdução a funções void
+                {
+                    title: "PRIMEIRA FUNÇÃO VOID",
+                    story: "Você encontrou o módulo de logs do sistema, que usa funções void para registrar eventos sem retorno.",
+                    question: `Qual é a sintaxe correta para definir uma função <span class="type">void</span> chamada <span class="type">logAcesso</span> que recebe uma string?`,
+                    code: "",
+                    options: [
+                        { text: 'A) <span class="type">void</span> logAcesso(<span class="type">string</span> mensagem) {}', correct: false },
+                        { text: 'B) <span class="type">void</span> logAcesso(<span class="type">char</span> *mensagem) {}', correct: true },
+                        { text: 'C) <span class="type">logAcesso</span>(<span class="type">void</span> mensagem) {}', correct: false },
+                        { text: 'D) <span class="type">void</span> logAcesso(<span class="type">char</span> mensagem[]) {}', correct: true }
+                    ],
+                    explanation: 'As respostas corretas são B e D. Em C, strings são arrays de char, então podemos usar "char *" ou "char []". A opção A está errada porque "string" não é um tipo em C padrão.'
+                },
+                // Fase 12 - Funções void com structs
+                {
+                    title: "VOID COM STRUCTS",
+                    story: "Para manipular os registros do sistema, você precisa criar funções void que modificam structs passadas como parâmetro.",
+                    question: `Como escrever corretamente uma função <span class="type">void</span> que modifica uma struct <span class="type">Config</span> passada por referência?`,
+                    code: `<span class="keyword">struct</span> <span class="type">Config</span> {
+    <span class="type">int</span> nivel;
+    <span class="type">char</span> tema[20];
+};`,
+                    options: [
+                        { text: 'A) <span class="type">void</span> modificarConfig(<span class="keyword">struct</span> <span class="type">Config</span> *cfg)', correct: true },
+                        { text: 'B) <span class="type">void</span> modificarConfig(<span class="type">Config</span> cfg)', correct: false },
+                        { text: 'C) <span class="type">void</span> modificarConfig(<span class="keyword">struct</span> <span class="type">Config</span> cfg)', correct: false },
+                        { text: 'D) <span class="type">void</span> modificarConfig(<span class="type">Config</span> *cfg)', correct: false }
+                    ],
+                    explanation: 'A resposta correta é a A. Para modificar a struct original, precisamos passar um ponteiro para ela, usando "struct Config *cfg". Sem o typedef, não podemos usar apenas "Config".'
+                },
+                // Fase 13 - Protótipos de funções void
+                {
+                    title: "PROTÓTIPOS DE FUNÇÃO",
+                    story: "O arquivo de cabeçalho do sistema está corrompido. Você precisa reconstruir os protótipos das funções void.",
+                    question: `Qual é o protótipo correto para uma função <span class="type">void</span> chamada <span class="type">atualizar</span> que recebe um ponteiro para <span class="type">int</span> e um <span class="type">float</span>?`,
+                    code: "",
+                    options: [
+                        { text: 'A) <span class="type">void</span> atualizar();', correct: false },
+                        { text: 'B) <span class="type">void</span> atualizar(<span class="type">int</span> *, <span class="type">float</span>);', correct: true },
+                        { text: 'C) <span class="type">void</span> atualizar(<span class="type">int</span> *, <span class="type">float</span> f);', correct: true },
+                        { text: 'D) <span class="type">atualizar</span>(<span class="type">void</span> *int, <span class="type">float</span>);', correct: false }
+                    ],
+                    explanation: 'As respostas corretas são B e C. Um protótipo em C pode incluir apenas os tipos ou os tipos com nomes de parâmetros. A opção B é um protótipo válido sem nomes, e C com nomes.'
+                },
+                // Fase 14 - Void como parâmetro
+                {
+                    title: "VOID COMO PARÂMETRO",
+                    story: "Para garantir que certas funções não recebam parâmetros, o sistema usa void na lista de parâmetros.",
+                    question: `Qual é a diferença entre as duas declarações a seguir?`,
+                    code: `<span class="type">void</span> funcao1();
+<span class="type">void</span> funcao2(<span class="type">void</span>);`,
+                    options: [
+                        { text: 'A) Nenhuma diferença, ambas declaram funções sem parâmetros', correct: false },
+                        { text: 'B) funcao1() pode receber argumentos, funcao2(void) não pode', correct: true },
+                        { text: 'C) funcao1(void) está errada, deveria ser funcao1()', correct: false },
+                        { text: 'D) Em C, void como parâmetro indica um ponteiro genérico', correct: false }
+                    ],
+                    explanation: 'A resposta correta é a B. Em C, funcao1() declara uma função que pode receber qualquer número de argumentos, enquanto funcao2(void) explicitamente declara que não recebe argumentos.'
+                },
+                // Fase 15 - Ponteiro void genérico
+                {
+                    title: "PONTEIROS VOID",
+                    story: "O sistema de tipos genéricos usa ponteiros void para lidar com diferentes formatos de dados. Você precisa entender como funcionam.",
+                    question: `Qual é a maneira correta de usar um ponteiro <span class="type">void</span> para acessar dados de um <span class="type">int</span>?`,
+                    code: `<span class="type">int</span> valor = 42;
+<span class="type">void</span> *ptr = &valor;`,
+                    options: [
+                        { text: 'A) <span class="type">int</span> x = *ptr;', correct: false },
+                        { text: 'B) <span class="type">int</span> x = *(<span class="type">int</span>*)ptr;', correct: true },
+                        { text: 'C) <span class="type">int</span> x = (<span class="type">int</span>)ptr;', correct: false },
+                        { text: 'D) <span class="type">int</span> x = ptr->valor;', correct: false }
+                    ],
+                    explanation: 'A resposta correta é a B. Ponteiros void precisam ser convertidos (cast) para o tipo correto antes de desreferenciar. A sintaxe correta é *(int*)ptr.'
+                },
+                // Fase 16 - Structs e funções void juntas
+                {
+                    title: "COMBINANDO STRUCTS E VOID",
+                    story: "Você alcançou o núcleo do sistema e encontra código que combina structs e funções void. Precisa entender para prosseguir.",
+                    question: `Qual é o erro no código a seguir?`,
+                    code: `<span class="keyword">struct</span> <span class="type">Sensor</span> {
+    <span class="type">int</span> id;
+    <span class="type">float</span> leitura;
+};
+
+<span class="type">void</span> configurarSensor(<span class="keyword">struct</span> <span class="type">Sensor</span> s, <span class="type">int</span> novoId) {
+    s.id = novoId;  <span class="comment">// Esta alteração não persiste</span>
+}
+
+<span class="type">int</span> main() {
+    <span class="keyword">struct</span> <span class="type">Sensor</span> sensor = {0, 0.0};
+    configurarSensor(sensor, 42);
+    <span class="comment">// sensor.id ainda é 0 aqui</span>
+}`,
+                    options: [
+                        { text: 'A) A struct Sensor deveria ser declarada com typedef', correct: false },
+                        { text: 'B) A função configurarSensor deveria retornar a struct modificada', correct: true },
+                        { text: 'C) O parâmetro s deveria ser um ponteiro para Sensor', correct: true },
+                        { text: 'D) Não há erro, o código está correto', correct: false }
+                    ],
+                    explanation: 'As respostas corretas são B e C. Em C, structs são passadas por valor, então modificações na função não afetam a original. Podemos resolver retornando a struct ou passando um ponteiro.'
+                },
+                // Fase 17 - Array de structs e função void
+                {
+                    title: "MODIFICANDO ARRAYS DE STRUCTS",
+                    story: "O módulo de gerenciamento de dispositivos usa arrays de structs. Você precisa criar uma função void para atualizá-los.",
+                    question: `Como escrever uma função <span class="type">void</span> que zera todas as leituras em um array de structs <span class="type">Sensor</span>?`,
+                    code: `<span class="keyword">struct</span> <span class="type">Sensor</span> {
+    <span class="type">int</span> id;
+    <span class="type">float</span> leitura;
+};
+
+<span class="comment">// Função para zerar leituras</span>`,
+                    options: [
+                        { text: 'A) <span class="type">void</span> zerarLeituras(<span class="type">Sensor</span> sensores[], <span class="type">int</span> n) {<br>for(<span class="type">int</span> i=0; i&lt;n; i++) { sensores[i].leitura = 0; }}', correct: false },
+                        { text: 'B) <span class="type">void</span> zerarLeituras(<span class="keyword">struct</span> <span class="type">Sensor</span> *sensores, <span class="type">int</span> n) {<br>while(n--) { sensores->leitura = 0; sensores++; }}', correct: true },
+                        { text: 'C) <span class="type">void</span> zerarLeituras(<span class="type">Sensor</span> array, <span class="type">int</span> tamanho) {<br>for(<span class="type">int</span> i=0; i&lt;tamanho; i++) { array[i].leitura = 0; }}', correct: false },
+                        { text: 'D) <span class="type">void</span> zerarLeituros(<span class="keyword">struct</span> <span class="type">Sensor</span> sensores, <span class="type">int</span> n) {<br>for(<span class="type">int</span> i=0; i&lt;n; i++) { sensores.leitura = 0; }}', correct: false }
+                    ],
+                    explanation: 'A resposta correta é a B. Arrays decaem em ponteiros quando passados para funções, então devemos usar um ponteiro para struct Sensor. A opção A estaria correta se usássemos typedef para Sensor.'
+                },
+                // Fase 18 - Função void com ponteiro void
+                {
+                    title: "FUNÇÃO GENÉRICA COM VOID*",
+                    story: "O sistema usa uma função genérica para log que aceita qualquer tipo de dado. Você precisa implementá-la corretamente.",
+                    question: `Como implementar uma função <span class="type">void</span> que imprime qualquer tipo de dado usando <span class="type">void*</span> e um parâmetro que especifica o tipo?`,
+                    code: `<span class="type">void</span> logDado(<span class="type">void</span> *dado, <span class="type">char</span> tipo) {
+    <span class="comment">// Implementação</span>
+}`,
+                    options: [
+                        { text: 'A) Usar switch no tipo e fazer cast adequado para cada caso', correct: true },
+                        { text: 'B) Usar printf("%v", dado) pois void* é genérico', correct: false },
+                        { text: 'C) Usar sizeof(*dado) para determinar o tipo automaticamente', correct: false },
+                        { text: 'D) Retornar o dado como string independente do tipo', correct: false }
+                    ],
+                    explanation: 'A resposta correta é a A. Ponteiros void precisam ser convertidos (cast) para o tipo correto antes de usar. Uma abordagem comum é usar um switch no parâmetro tipo para decidir como tratar o dado.'
+                },
+                // Fase 19 - Callback com função void
+                {
+                    title: "CALLBACKS COM FUNÇÕES VOID",
+                    story: "O sistema de eventos usa callbacks com funções void. Você precisa consertar a implementação.",
+                    question: `Como declarar corretamente um parâmetro de função que recebe um callback <span class="type">void</span> com um parâmetro <span class="type">int</span>?`,
+                    code: "",
+                    options: [
+                        { text: 'A) <span class="type">void</span> registrarCallback(<span class="type">void</span> (*callback)())', correct: false },
+                        { text: 'B) <span class="type">void</span> registrarCallback(<span class="type">void</span> (*callback)(<span class="type">int</span>))', correct: true },
+                        { text: 'C) <span class="type">void</span> registrarCallback(<span class="type">callback</span>(<span class="type">void</span>))', correct: false },
+                        { text: 'D) <span class="type">void</span> registrarCallback(<span class="type">function</span>(<span class="type">int</span>) callback)', correct: false }
+                    ],
+                    explanation: 'A resposta correta é a B. Em C, declaramos um parâmetro como ponteiro para função com a sintaxe: tipo_retorno (*nome_parametro)(tipo_parametros). No caso, void (*callback)(int).'
+                },
+                // Fase 20 - Desafio final
+                {
+                    title: "DESAFIO FINAL: CORRIGIR O CÓDIGO",
+                    story: "Você alcançou o núcleo do sistema corrompido! Corrija o código abaixo para inicializar e exibir os dados corretamente e escapar do sistema.",
+                    question: `Qual é a saída correta deste programa após todas as correções?`,
+                    code: `<span class="keyword">struct</span> <span class="type">Aluno</span> {
+    <span class="type">char</span> nome[20];
+    <span class="type">int</span> idade;
+    <span class="type">float</span> notas[3];
+};
+
+<span class="comment">// Função para inicializar um aluno - CORRIGIR</span>
+<span class="type">void</span> inicializarAluno(<span class="type">Aluno</span> *a, <span class="type">char</span> *nome, <span class="type">int</span> idade, <span class="type">float</span> n1, <span class="type">float</span> n2, <span class="type">float</span> n3) {
+    a->nome = nome;
+    a->idade = idade;
+    a->notas[0] = n1;
+    a->notas[1] = n2;
+    a->notas[2] = n3;
+}
+
+<span class="comment">// Função para calcular média - CORRIGIR</span>
+<span class="type">float</span> calcularMedia(<span class="type">void</span> *aluno) {
+    <span class="type">Aluno</span> *a = aluno;
+    return (a->notas[0] + a->notas[1] + a->notas[2]) / 3;
+}
+
+<span class="type">int</span> main() {
+    <span class="type">Aluno</span> aluno1;
+    inicializarAluno(aluno1, "Ana", 20, 8.5, 7.0, 9.0);
+    
+    <span class="type">float</span> media = calcularMedia(&aluno1);
+    printf("Média: %.2f", media);
+}`,
+                    options: [
+                        { text: 'A) O programa não compila devido a múltiplos erros', correct: true },
+                        { text: 'B) Média: 8.17', correct: false },
+                        { text: 'C) Média: 8.17, mas com memory leaks', correct: false },
+                        { text: 'D) O programa compila mas crasha na execução', correct: false }
+                    ],
+                    explanation: 'A resposta correta é a A. Há vários erros no código: 1) Falta "struct" antes de Aluno; 2) Não se pode atribuir strings com =, deve usar strcpy; 3) Parâmetro aluno1 deveria ser &aluno1; 4) O ponteiro void precisa de cast. Portanto, o código não compila.'
+                }
+            ]
+        };
+
+        // Elementos da interface
+        const introScreen = document.getElementById('intro-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const completionScreen = document.getElementById('completion-screen');
+        const startButton = document.getElementById('start-button');
+        const playerNameInput = document.getElementById('player-name');
+        const phaseTitle = document.getElementById('phase-title');
+        const phaseStory = document.getElementById('phase-story');
+        const phaseQuestion = document.getElementById('phase-question');
+        const optionsContainer = document.getElementById('options-container');
+        const feedbackContainer = document.getElementById('feedback-container');
+        const nextButton = document.getElementById('next-button');
+        const restartButton = document.getElementById('restart-button');
+        const phaseCounter = document.getElementById('phase-counter');
+        const progressBar = document.getElementById('progress-bar');
+        const playerNameDisplay = document.getElementById('player-name-display');
+        const certName = document.getElementById('cert-name');
+        const completionDate = document.getElementById('completion-date');
+        const printButton = document.getElementById('print-button');
+        const restartGameButton = document.getElementById('restart-game-button');
+
+        // Iniciar o jogo
+        startButton.addEventListener('click', () => {
+            const name = playerNameInput.value.trim();
+            if (name === '') {
+                alert('Por favor, insira seu nome para começar.');
+                return;
+            }
+            
+            gameData.playerName = name;
+            introScreen.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+            loadPhase(0);
+            
+            // Efeito sonoro simulado (na prática seria um Audio())
+            console.log('Iniciando jogo...');
+        });
+
+        // Carregar uma fase
+        function loadPhase(phaseIndex) {
+            if (phaseIndex >= gameData.phases.length) {
+                completeGame();
+                return;
+            }
+            
+            gameData.currentPhase = phaseIndex;
+            const phase = gameData.phases[phaseIndex];
+            
+            // Atualizar interface
+            phaseTitle.innerHTML = phase.title;
+            phaseStory.innerHTML = phase.story;
+            phaseQuestion.innerHTML = phase.question;
+            
+            if (phase.code) {
+                phaseQuestion.innerHTML += `<pre class="mt-4 p-3 bg-gray-900 rounded text-sm overflow-x-auto">${phase.code}</pre>`;
+            }
+            
+            // Atualizar opções
+            optionsContainer.innerHTML = '';
+            phase.options.forEach((option, i) => {
+                const optionElement = document.createElement('button');
+                optionElement.className = 'cyberpunk-btn p-4 text-left bg-gray-800 hover:bg-gray-700 rounded border border-gray-700 text-code transition-all';
+                optionElement.innerHTML = option.text;
+                optionElement.addEventListener('click', () => checkAnswer(i));
+                optionsContainer.appendChild(optionElement);
+            });
+            
+            // Esconder feedback e próximo botão
+            feedbackContainer.classList.add('hidden');
+            nextButton.classList.add('hidden');
+            
+            // Atualizar progresso
+            const progressPercentage = (phaseIndex + 1) / gameData.totalPhases * 100;
+            progressBar.style.width = `${progressPercentage}%`;
+            phaseCounter.textContent = `Fase ${phaseIndex + 1} de ${gameData.totalPhases}`;
+        }
+
+        // Verificar resposta
+        function checkAnswer(optionIndex) {
+    const phase = gameData.phases[gameData.currentPhase];
+    const option = phase.options[optionIndex];
+
+    // Mostrar feedback
+    feedbackContainer.classList.remove('hidden');
+    feedbackContainer.innerHTML = '';
+
+    const feedbackTitle = document.createElement('h3');
+    feedbackTitle.className = 'text-xl font-bold mb-2 ' + (option.correct ? 'text-green-400 glow-green' : 'text-red-400');
+    feedbackTitle.textContent = option.correct ? 'RESPOSTA CORRETA!' : 'RESPOSTA INCORRETA';
+    feedbackContainer.appendChild(feedbackTitle);
+
+    const feedbackExplanation = document.createElement('p');
+    feedbackExplanation.className = 'mt-2 text-code text-gray-300';
+    feedbackExplanation.innerHTML = phase.explanation;
+    feedbackContainer.appendChild(feedbackExplanation);
+    if (option.correct) {
+    const countdownMsg = document.createElement('p');
+    countdownMsg.className = 'text-cyan-400 text-code mt-4';
+    countdownMsg.textContent = 'Avançando para a próxima fase em 7 segundos...';
+    feedbackContainer.appendChild(countdownMsg);
+}
+
+    // Estilizar feedback
+    feedbackContainer.className = option.correct ?
+        'my-6 p-4 rounded border border-green-500 bg-gray-900' :
+        'my-6 p-4 rounded border border-red-500 bg-gray-900';
+
+    // Estilizar botões
+    const optionButtons = optionsContainer.querySelectorAll('button');
+    optionButtons.forEach((btn, i) => {
+        if (i === optionIndex) {
+            if (option.correct) {
+                btn.classList.add('bg-green-900', 'border-green-500');
+            } else {
+                btn.classList.add('bg-red-900', 'border-red-500');
+            }
+        } else if (phase.options[i].correct) {
+            btn.classList.add('bg-blue-900', 'border-blue-500');
+        }
+        btn.disabled = true;
+    });
+
+    // Avança ou reinicia automaticamente
+    if (option.correct) {
+        setTimeout(() => {
+            loadPhase(gameData.currentPhase + 1);
+        }, 7000);
+    } else {
+        errorCount++;
+        const restartMsg = document.createElement('p');
+        restartMsg.className = 'text-red-500 text-code mt-4';
+        restartMsg.textContent = 'Você errou! Reiniciando em 5 segundos...';
+        feedbackContainer.appendChild(restartMsg);
+
+        setTimeout(() => {
+            loadPhase(0);
+        }, 5000);
+    }
+}
+
+
+        // Completar o jogo
+        function completeGame() {
+            gameScreen.classList.add('hidden');
+            completionScreen.classList.remove('hidden');
+            
+            playerNameDisplay.textContent = gameData.playerName;
+            certName.textContent = gameData.playerName;
+            
+            const today = new Date();
+            completionDate.textContent = today.toLocaleDateString('pt-BR');
+            
+            // Efeito de confete simulado
+            console.log('Jogo completo!');
+        }
+
+        // Imprimir certificado
+        printButton.addEventListener('click', () => {
+            window.print();
+        });
+
+        // Recomeçar o jogo
+        restartGameButton.addEventListener('click', () => {
+            completionScreen.classList.add('hidden');
+            introScreen.classList.remove('hidden');
+            playerNameInput.value = gameData.playerName;
+        });
+
+        // Efeitos de terminal
+        const elements = document.querySelectorAll('.text-code');
+        elements.forEach(el => {
+            el.innerHTML = el.textContent.replace(/./g, `<span class="char">$&</span>`);
+        });
+    </script>
+</body>
+</html>
