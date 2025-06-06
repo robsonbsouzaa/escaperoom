@@ -4,7 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Escape Room: Programação C</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com">
+const completionDateSpan = document.getElementById('completion-date');
+if (completionDateSpan) {
+  const hoje = new Date();
+  const dataFormatada = hoje.toLocaleDateString('pt-BR');
+  completionDateSpan.textContent = dataFormatada;
+}
+
+</script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
@@ -148,7 +156,7 @@
                 <div class="flex justify-center mb-6">
                     <i class="fas fa-trophy text-6xl text-yellow-400 glow-purple"></i>
                 </div>
-                <h2 class="text-3xl md:text-4xl text-code glow-green mb-6">CONGRATULAÇÕES, <span id="player-name-display" class="text-yellow-300"></span>!</h2>
+                <h2 class="text-3xl md:text-4xl text-code glow-green mb-6">PARABÉNS , <span id="player-name-display" class="text-yellow-300"></span>!</h2>
                 <p class="mb-6 text-xl">Você escapou do sistema corrompido!</p>
                 <p class="mb-8 text-code text-cyan-300">Todos os 20 desafios foram completados com sucesso.</p>
                 
